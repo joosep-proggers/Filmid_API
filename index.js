@@ -11,9 +11,10 @@ const events = [
     { id: 3, name: "Eminmen Concert", location: "Saku Suurhall", date: "2022-06-01 14:00:00", price: "0" }
 ]
 
-app.get('/items', (req, res) => {
-    res.send(events)
-})
+const users = [{username: "admin", password: "admin", isAdmin: true},
+{username: "user", password: "password", isAdmin: false}]
+
+const sessions = []
 
 
 app.get('/events', (req, res) => {
@@ -42,6 +43,49 @@ app.post('/events', (req, res) => {
     res.status(201).location('localhost:8080/events/' + (events.length - 1)).send(
         newEvent
     )
+})
+
+app.post('/sessions', (req,res) => {
+    if (!req.body.username || !req.body.password){
+        return res.status(400).send({error: "One or more parameters missing"})
+    } else {
+        userMatched = 0
+        checkAdmin = false
+        users.forEach((element) => {
+            if(element.username == req.body.username || element.password == req.body.password){
+                userMatched += 1
+                if (element.isAdmin == true){
+                    checkAdmin = true
+                } 
+                sessionId = Math.round(Math.random() * 100000000)
+                session = {id: sessionId, user: req.body.username}
+                sessions.push(session)
+                console.log(sessions)
+            }
+        });
+        if (userMatched == 0){
+            return res.status(401).send({error: "Invalid username or password"})
+        }
+        else if (userMatched == 1){
+            return res.status(201).send({success: true, isAdmin: checkAdmin, sessionId: sessionId})
+        }
+    }
+});
+
+app.post('/logout', (req, res) => {
+    if (!req.body.username || !req.body.sessionId){
+        return res.status(400).send({error: "One or more parameters missing"})
+    } else {
+        sessions.forEach((element) => {
+            if (element.user == req.body.username || element.id == req.body.sessionId) {
+                sessions.splice(element)
+                console.log(sessions)
+                return res.status(201).send({success: true})
+            } else {
+                return res.status(401).send({error: "Invalid sessionId or username"})
+            }
+        })
+    } 
 })
 
 app.listen(8080, () => {
