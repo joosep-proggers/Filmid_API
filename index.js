@@ -29,20 +29,40 @@ app.get('/events/:id', (req, res) => {
 })
 
 app.post('/events', (req, res) => {
-    if (!req.body.name || !req.body.price || !req.body.location || !req.body.date) {
-        return res.status(400).send({ error: 'One or all params are missing' })
+
+    let auth = req.headers.authorization
+
+    console.log(req.body)
+
+    if(!auth){
+        return res.status(400).send({error: "Missing authorization header"})
+    } else {
+        try{
+            let obj = sessions.find(o => o.id == auth)
+
+            if(!obj.isAdmin){
+                return res.status(403).send({error: "Unathorized"})
+            } else {
+
+                if (!req.body.name || !req.body.price || !req.body.location || !req.body.date) {
+                    return res.status(400).send({ error: 'One or all params are missing' })
+                }
+                let newEvent = {
+                    id: events.length + 1,
+                    name: req.body.name,
+                    location: req.body.location,
+                    date: req.body.date,
+                    price: req.body.price
+                }
+                events.push(newEvent)
+                res.status(201).location('localhost:8080/events/' + (events.length - 1)).send(newEvent)
+            }
+        }
+        catch(error){
+            console.log(error)
+            return res.status(401).send({error: "Session not found"})
+        }
     }
-    let newEvent = {
-        id: events.length + 1,
-        name: req.body.name,
-        location: req.body.location,
-        date: req.body.date,
-        price: req.body.price
-    }
-    events.push(newEvent)
-    res.status(201).location('localhost:8080/events/' + (events.length - 1)).send(
-        newEvent
-    )
 })
 
 app.post('/sessions', (req,res) => {
