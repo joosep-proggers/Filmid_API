@@ -5,7 +5,7 @@ const app = express();
 app.use(cors());        // Avoid CORS errors in browsers
 app.use(express.json()) // Populate req.body
 
-const events = [
+let events = [
     { id: 1, name: "Magnus' Among Us themed Birthday Party", location: "Aedevahe talu, Kursi küla, Harjumaa", date: "2022-08-08 19:00:00", price: "16.50"},
     { id: 2, name: "Joe Nuts' Public Execution", location: "Raekoja plats", date: "2022-03-25 16:00:00",  price: "6.99"},
     { id: 3, name: "Eminmen Concert", location: "Saku Suurhall", date: "2022-06-01 14:00:00", price: "0" }
@@ -58,9 +58,8 @@ app.post('/sessions', (req,res) => {
                     checkAdmin = true
                 } 
                 sessionId = Math.round(Math.random() * 100000000)
-                session = {id: sessionId, user: req.body.username}
+                session = {id: sessionId, user: req.body.username, isAdmin: checkAdmin}
                 sessions.push(session)
-                console.log(sessions)
             }
         });
         if (userMatched == 0){
@@ -79,13 +78,48 @@ app.post('/logout', (req, res) => {
         sessions.forEach((element) => {
             if (element.user == req.body.username || element.id == req.body.sessionId) {
                 sessions.splice(element)
-                console.log(sessions)
                 return res.status(201).send({success: true})
             } else {
                 return res.status(401).send({error: "Invalid sessionId or username"})
             }
         })
     } 
+})
+
+app.delete('/events/:id', (req, res) => {
+
+    let auth = req.headers.authorization
+
+    if(!auth){
+        return res.status(400).send({error: "Missing authorization header"})
+    } else {
+        try{
+            let obj = sessions.find(o => o.id == auth)
+
+            if(!obj.isAdmin){
+                return res.status(403).send({error: "Unathorized"})
+            } else {
+
+                if(!events[req.params.id-1]){
+                    return res.status(404).send({error: "Event not found"})
+                }
+
+                events.splice(req.params.id - 1, 1)
+
+                for(let i = 0; i < events.length; i++){
+                    events[i].id = i +1
+                }
+
+                return res.status(200).send({success: true})
+            }
+
+        }
+        catch(error){
+            console.log(error)
+            return res.status(401).send({error: "Session not found"})
+        }
+
+    }
 })
 
 app.listen(8080, () => {
