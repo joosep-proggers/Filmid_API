@@ -46,8 +46,10 @@ const vue = Vue.createApp({
                     if(localStorage.getItem('isAdmin') == 'true'){
                         deleteBtn = document.getElementById('deleteBtn'); 
                         addBtn = document.getElementById('addBtn')      
+                        editBtn = document.getElementById("editBtn")
                         deleteBtn.style.display = "block"
                         addBtn.style.display = "block"
+                        editBtn.style.display = "block"
                     }  
                 } 
             })
@@ -76,13 +78,13 @@ const vue = Vue.createApp({
                     document.getElementById("sign-in-btn").textContent = "Sign In"
                     document.getElementById("deleteBtn").style.display = "none"
                     document.getElementById("addBtn").style.display = "none"
+                    document.getElementById("editBtn").style.display ="none"
                     localStorage.clear()
                 }
             })
         },
 
         deleteEvent: async function (id) {
-
             const deleteRequest = {
                 method: "DELETE",
                 headers: {
@@ -93,8 +95,12 @@ const vue = Vue.createApp({
 
             await fetch(`http://localhost:8080/events/${id}`, deleteRequest)
             .then(response => response.json())
-            .then(data => console.log(data))
-
+            .then((data) => {
+                if(data.error){
+                    alert("Something went wrong, try again later \n" + data.error)
+                }
+            })
+            
             this.events = await (await fetch('http://localhost:8080/events')).json();
         },
 
@@ -138,6 +144,42 @@ const vue = Vue.createApp({
             this.addPrice = ""
 
             this.events = await (await fetch('http://localhost:8080/events')).json();
+        },
+
+        showEditEventModal: function (){
+            let eventEditModal = new bootstrap.Modal(document.getElementById('editEventModal'), {})
+            eventEditModal.show()
+        },
+        
+        editEvent: async function (id) {
+            this.editName = document.getElementById('editEventName').value
+            this.editLocation = document.getElementById('editEventLocation').value
+            this.editDate = document.getElementById('editEventDate').value
+            this.editPrice = document.getElementById('editEventPrice').value
+
+            const editRequest = {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": localStorage.getItem('sessionId')
+                },
+                body: JSON.stringify({
+                    name: this.editName,
+                    location: this.editLocation,
+                    date: this.editDate,
+                    price: this.editPrice
+                }) 
+            }
+
+            await fetch(`http://localhost:8080/events/${id}`, editRequest)
+            .then(response => response.json())
+            .then((data) => {
+                if(data.error){
+                    alert("Something went wrong, try again later \n" + data.error)
+                }
+            })
+
+            this.events = await (await fetch('http://localhost:8080/events')).json();
         }
-    }  
+    }
 }).mount('body')

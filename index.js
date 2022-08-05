@@ -32,8 +32,6 @@ app.post('/events', (req, res) => {
 
     let auth = req.headers.authorization
 
-    console.log(req.body)
-
     if(!auth){
         return res.status(400).send({error: "Missing authorization header"})
     } else {
@@ -41,7 +39,7 @@ app.post('/events', (req, res) => {
             let obj = sessions.find(o => o.id == auth)
 
             if(!obj.isAdmin){
-                return res.status(403).send({error: "Unathorized"})
+                return res.status(403).send({error: "Unauthorized"})
             } else {
 
                 if (!req.body.name || !req.body.price || !req.body.location || !req.body.date) {
@@ -64,6 +62,42 @@ app.post('/events', (req, res) => {
         }
     }
 })
+
+app.patch('/events/:id', (req, res) => {
+
+    let auth = req.headers.authorization
+
+    if(!auth){
+        return res.status(400).send({error: "Missing authorization header"})
+    } else {
+        try{
+            let obj = sessions.find(o => o.id == auth)
+
+            if(!obj.isAdmin){
+                return res.status(403).send({error: "Unauthorized"})
+            } else {
+
+                if(!events[req.params.id-1]){
+                    return res.status(404).send({error: "Event not found"})
+                }
+
+                let event = events.find(o => o.id == req.params.id)
+
+                event.name = req.body.name
+                event.location = req.body.location
+                event.date = req.body.date
+                event.price = req.body.price
+                
+                res.status(200).send({success: true})
+            }
+
+        }
+        catch(error){
+            console.log(error)
+            return res.status(401).send({error: "Session not found"})
+        }
+    }
+});
 
 app.post('/sessions', (req,res) => {
     if (!req.body.username || !req.body.password){

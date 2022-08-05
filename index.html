@@ -67,6 +67,7 @@
 							</table>
 						</div>
 						<div class="modal-footer">
+							<button @click="showEditEventModal" class="btn btn-primary" id="editBtn" data-bs-dismiss="modal" style="display: none;">Edit</button>
 							<button @click="deleteEvent(eventInModal.id)" type="button" class="btn btn-danger" id="deleteBtn" style="display: none;" data-bs-dismiss="modal">Delete</button>
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 						</div>
@@ -104,29 +105,57 @@
 					</div>
 				</div>
 			</div>
+			<div id="editEventModal" class="modal">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<table class="table table-striped">
+								<tr>
+									<td>
+										<label for="editName">{{eventInModal.name}}</label>
+									</td>
+									<td>
+										<input type="text" id="editEventName" name="editName"></input>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label for="editLocation">{{eventInModal.location}}</label>
+									</td>
+									<td>
+										<input type="text" id="editEventLocation" name="editLocation"></input>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label for="editDate">{{eventInModal.date}}</label>
+									</td>
+									<td>
+										<input type="date" id="editEventDate" name="editDate"></input>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label for="editPrice">{{eventInModal.price}}</label>
+									</td>
+									<td>
+										<input type="number" min="0" id="editEventPrice" name="editPrice"></input>
+									</td>
+								</tr>
+							</table>	
+						</div>
+						<div class="modal-footer">
+							<button @click="editEvent(eventInModal.id)" class="btn btn-success" id="editEventBtn" data-bs-dismiss="modal">Save changes</button>
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-		<script>
-			window.onload = checkIfLoggedIn();
-			function showLoginPanel() {
-				if (document.getElementById('signIn').style.display == "none") {
-					document.getElementById('signIn').style.display = "block";
-					document.getElementById('sign-in-btn').textContent = "Close"
-				} else {
-					document.getElementById('signIn').style.display = "none"
-					document.getElementById('sign-in-btn').textContent = "Sign In"
-				}
-			}
-			function checkIfLoggedIn() {
-				if (localStorage.length != 0) {
-					document.getElementById('sign-in-btn').style.display = "none"
-					document.getElementById('sign-out-btn').style.display = "block"
-					if (localStorage.getItem('isAdmin') == 'true') { 
-						document.getElementById('deleteBtn').style.display = "block"
-						document.getElementById('addBtn').style.display = "block"
-					}	
-				}
-			}
-		</script>
+		<script src="checkLogin.js"></script>
 		<script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		<script src="./rest-client.js"></script>
