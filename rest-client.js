@@ -6,7 +6,11 @@ const vue = Vue.createApp({
         }
     },
     async created(){
-        this.events = await (await fetch('http://localhost:8080/events')).json();
+        try{ 
+            this.events = await (await fetch('http://localhost:8080/events')).json();}
+        catch(error){
+            alert("Something went wrong " + error)
+        }
     },
     methods: {
         getEvent: async function (id) {
@@ -32,7 +36,7 @@ const vue = Vue.createApp({
             await fetch("http://localhost:8080/sessions", loginRequest)
             .then(response => response.json())
             .then(data => {
-                const signInMsg = document.getElementById("si-error-msg")
+                let signInMsg = document.getElementById("si-error-msg")
                 if (data.error){
                     signInMsg.textContent = (data.error)
                 } else {
@@ -42,6 +46,7 @@ const vue = Vue.createApp({
                     document.getElementById("signIn").style.display = "none"
                     document.getElementById("sign-in-btn").style.display = "none"
                     document.getElementById("sign-out-btn").style.display = "block"
+                    signInMsg.textContent = ""
 
                     if(localStorage.getItem('isAdmin') == 'true'){
                         deleteBtn = document.getElementById('deleteBtn'); 
@@ -66,20 +71,21 @@ const vue = Vue.createApp({
                     username: localStorage.getItem('username')
                 }) 
             }
+
+            document.getElementById("sign-in-btn").style.display = "block"
+            document.getElementById("sign-out-btn").style.display = "none"
+            document.getElementById("sign-in-btn").textContent = "Sign In"
+            document.getElementById("deleteBtn").style.display = "none"
+            document.getElementById("addBtn").style.display = "none"
+            document.getElementById("editBtn").style.display ="none"
+            localStorage.clear()
+
             await fetch("http://localhost:8080/logout", logoutRequest)
             .then(response => response.json())
             .then(data => {
                 const signOutMsg = document.getElementById("so-error-msg")
                 if (data.error) {
                     signOutMsg.textContent = (data.error)
-                } else {
-                    document.getElementById("sign-in-btn").style.display = "block"
-                    document.getElementById("sign-out-btn").style.display = "none"
-                    document.getElementById("sign-in-btn").textContent = "Sign In"
-                    document.getElementById("deleteBtn").style.display = "none"
-                    document.getElementById("addBtn").style.display = "none"
-                    document.getElementById("editBtn").style.display ="none"
-                    localStorage.clear()
                 }
             })
         },

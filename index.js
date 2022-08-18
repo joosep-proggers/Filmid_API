@@ -106,7 +106,7 @@ app.post('/sessions', (req,res) => {
         userMatched = 0
         checkAdmin = false
         users.forEach((element) => {
-            if(element.username == req.body.username || element.password == req.body.password){
+            if(element.username == req.body.username && element.password == req.body.password){
                 userMatched += 1
                 if (element.isAdmin == true){
                     checkAdmin = true
