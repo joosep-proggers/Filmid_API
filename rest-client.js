@@ -122,6 +122,8 @@ const vue = Vue.createApp({
             this.addDate = document.getElementById('addEventDate').value
             this.addPrice = document.getElementById('addEventPrice').value
 
+            this.addDate = this.addDate.replace("T", " ")
+
             const addRequest = {
                 method: "POST",
                 headers: {
@@ -158,10 +160,15 @@ const vue = Vue.createApp({
         },
         
         editEvent: async function (id) {
+
+            
+
             this.editName = document.getElementById('editEventName').value
             this.editLocation = document.getElementById('editEventLocation').value
             this.editDate = document.getElementById('editEventDate').value
             this.editPrice = document.getElementById('editEventPrice').value
+
+            this.editDate = this.editDate.replace("T", " ")
 
             const editRequest = {
                 method: "PATCH",

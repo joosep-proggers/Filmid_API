@@ -6,9 +6,9 @@ app.use(cors());        // Avoid CORS errors in browsers
 app.use(express.json()) // Populate req.body
 
 let events = [
-    { id: 1, name: "Magnus' Among Us themed Birthday Party", location: "Aedevahe talu, Kursi küla, Harjumaa", date: "2022-08-08 19:00:00", price: "16.50"},
-    { id: 2, name: "Joe Nuts' Public Execution", location: "Raekoja plats", date: "2022-03-25 16:00:00",  price: "6.99"},
-    { id: 3, name: "Eminmen Concert", location: "Saku Suurhall", date: "2022-06-01 14:00:00", price: "0" }
+    { id: 1, name: "Magnus' Among Us themed Birthday Party", location: "Aedevahe talu, Kursi küla, Harjumaa", date: "2022-08-08 19:00", price: "16.50"},
+    { id: 2, name: "Joe Nuts' Public Execution", location: "Raekoja plats", date: "2022-03-25 16:00",  price: "6.99"},
+    { id: 3, name: "Eminmen Concert", location: "Saku Suurhall", date: "2022-06-01 14:00", price: "0" }
 ]
 
 const users = [{username: "admin", password: "admin", isAdmin: true},
@@ -83,10 +83,29 @@ app.patch('/events/:id', (req, res) => {
 
                 let event = events.find(o => o.id == req.params.id)
 
-                event.name = req.body.name
-                event.location = req.body.location
-                event.date = req.body.date
-                event.price = req.body.price
+                if (req.body.name == ""){
+                    event.name = event.name
+                } else {
+                    event.name = req.body.name
+                }
+
+                if (req.body.location == ""){
+                    event.location = event.location
+                } else {
+                    event.location = req.body.location
+                }
+
+                if (req.body.date == ""){
+                    event.date = event.date
+                } else {
+                    event.date = req.body.date
+                }
+                
+                if (req.body.price == ""){
+                    event.price = event.price
+                } else {
+                    event.price = req.body.price
+                }
                 
                 res.status(200).send({success: true})
             }
