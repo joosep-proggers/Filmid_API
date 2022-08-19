@@ -186,6 +186,13 @@ const vue = Vue.createApp({
             })
 
             this.events = await (await fetch('http://localhost:8080/events')).json();
+
+            document.getElementById('editEventName').value = ""
+            document.getElementById('editEventLocation').value = ""
+            document.getElementById('editEventDate').value = ""
+            document.getElementById('editEventPrice').value = ""
+
+
         }
     }
 }).mount('body')
