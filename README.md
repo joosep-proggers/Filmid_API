@@ -5,4 +5,4 @@ Built as a project to get more familiar with API's, asynchronous and synchronous
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Built as a team project with [katpoola](http://github.com/katpoola)
+# Built as a team project with [katpoola](http://github.com/katpoola)
