@@ -2,6 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
+let expressWs = require('express-ws')(app)
+
+app.ws('/', function(ws, req) {
+    ws.on('message', function(msg) {
+        expressWs.getWss().clients.forEach(client => client.send(msg));
+    });
+})
+
 app.use(cors());        // Avoid CORS errors in browsers
 app.use(express.json()) // Populate req.body
 
@@ -53,6 +61,7 @@ app.post('/events', (req, res) => {
                     price: req.body.price
                 }
                 events.push(newEvent)
+                expressWs.getWss().clients.forEach(client => client.send(JSON.stringify(newEvent)))
                 res.status(201).location('localhost:8080/events/' + (events.length - 1)).send(newEvent)
             }
         }
@@ -106,7 +115,8 @@ app.patch('/events/:id', (req, res) => {
                 } else {
                     event.price = req.body.price
                 }
-                
+                expressWs.getWss().clients.forEach(client => client.send(JSON.stringify(event)))
+
                 res.status(200).send({success: true})
             }
 
@@ -182,7 +192,7 @@ app.delete('/events/:id', (req, res) => {
                 for(let i = 0; i < events.length; i++){
                     events[i].id = i +1
                 }
-
+                expressWs.getWss().clients.forEach(client => client.send(req.params.id));
                 return res.status(200).send({success: true})
             }
 

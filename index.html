@@ -9,6 +9,9 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 	</head>
 	<body>
+
+		<!-- Sign in panel -->
+
 		<div id="sign-in">
 			<button class="btn" id="sign-in-btn" onclick="showLoginPanel()" style="display: block;">Sign In</button>
 			<button class="btn" id="sign-out-btn" @click="logout" style="display: none;">Sign Out</button>
@@ -35,6 +38,9 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Events table view -->
+
 		<div id="events">
 			<table id="eventsTable" class="table table-striped table-bordered">
 				<tr>
@@ -74,6 +80,9 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- Event adding modal -->
+
 			<div id="addEventModal" class="modal">
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -105,6 +114,9 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- Event editing modal -->
+
 			<div id="editEventModal" class="modal">
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -156,7 +168,6 @@
 				</div>
 			</div>
 		</div>
-		<script src="checkLogin.js"></script>
 		<script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		<script src="./rest-client.js"></script>

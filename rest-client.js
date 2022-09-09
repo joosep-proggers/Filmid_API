@@ -1,3 +1,26 @@
+window.onload = checkIfLoggedIn();
+function showLoginPanel() {
+    if (document.getElementById('signIn').style.display == "none") {
+        document.getElementById('signIn').style.display = "block";
+        document.getElementById('sign-in-btn').textContent = "Close"
+    } else {
+        document.getElementById('signIn').style.display = "none"
+        document.getElementById('sign-in-btn').textContent = "Sign In"
+    }
+}
+function checkIfLoggedIn() {
+    if (localStorage.length != 0) {
+        document.getElementById('sign-in-btn').style.display = "none"
+        document.getElementById('sign-out-btn').style.display = "block"
+        if (localStorage.getItem('isAdmin') == 'true') { 
+            document.getElementById('deleteBtn').style.display = "block"
+            document.getElementById('addBtn').style.display = "block"
+            document.getElementById('editBtn').style.display = "block"
+        }	
+    }
+}
+
+
 const vue = Vue.createApp({
     data() {
         return {
@@ -107,7 +130,14 @@ const vue = Vue.createApp({
                 }
             })
             
-            this.events = await (await fetch('http://localhost:8080/events')).json();
+        },
+
+        removeEvent: function (id) {
+            this.events.splice(id-1,1)
+            for(let i = 0; i < this.events.length; i++){
+                this.events[i].id = i +1
+            }
+            
         },
 
         showAddEventModal: function () {
@@ -146,12 +176,26 @@ const vue = Vue.createApp({
                 }
             })
 
-            this.addName = ""
-            this.addLocation = ""
-            this.addDate = ""
-            this.addPrice = ""
+            this.addName.value = ""
+            this.addLocation.value = ""
+            this.addDate.value = ""
+            this.addPrice.value = ""
 
             this.events = await (await fetch('http://localhost:8080/events')).json();
+        },
+        
+        newOrEditEvent: function (eventData) {
+
+            if(eventData.id > this.events.length){
+                let newEvent = JSON.parse(eventData)
+                this.events.push(newEvent)
+            }else{
+                eventData = JSON.parse(eventData)
+                this.events[eventData.id-1] = eventData
+                
+            }
+            
+            
         },
 
         showEditEventModal: function (){
@@ -203,3 +247,14 @@ const vue = Vue.createApp({
         }
     }
 }).mount('body')
+
+const connection = new WebSocket("ws://localhost:8080/")
+    connection.onmessage = function (event) {
+        console.log(event.data)
+        
+        if (event.data.length > 3) {
+            vue.newOrEditEvent(event.data)
+        } else {
+            vue.removeEvent(event.data)
+        }
+    }
