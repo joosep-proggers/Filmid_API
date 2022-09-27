@@ -4,6 +4,8 @@ const app = express();
 
 let expressWs = require('express-ws')(app)
 
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 app.ws('/', function(ws, req) {
     ws.on('message', function(msg) {
         expressWs.getWss().clients.forEach(client => client.send(msg));
@@ -25,7 +27,8 @@ const users = [{username: "admin", password: "admin", isAdmin: true},
 const sessions = []
 
 
-app.get('/events', (req, res) => {
+app.get('/events', async (req, res) => {
+    await delay(3000)
     res.send(events)
 })
 

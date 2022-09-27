@@ -25,12 +25,14 @@ const vue = Vue.createApp({
     data() {
         return {
             eventInModal: {name: null}, 
-            events: [] 
+            events: JSON.parse(localStorage.getItem('events'))
         }
     },
     async created(){
         try{ 
-            this.events = await (await fetch('http://localhost:8080/events')).json();}
+            this.events = await (await fetch('http://localhost:8080/events')).json();
+            localStorage.setItem('events', JSON.stringify(this.events))
+        }
         catch(error){
             alert("Something went wrong " + error)
         }
@@ -137,7 +139,7 @@ const vue = Vue.createApp({
             for(let i = 0; i < this.events.length; i++){
                 this.events[i].id = i +1
             }
-            
+            localStorage.setItem('events', JSON.stringify(this.events))
         },
 
         showAddEventModal: function () {
@@ -189,10 +191,11 @@ const vue = Vue.createApp({
             if(eventData.id > this.events.length){
                 let newEvent = JSON.parse(eventData)
                 this.events.push(newEvent)
+                localStorage.setItem('events', JSON.stringify(this.events))
             }else{
                 eventData = JSON.parse(eventData)
                 this.events[eventData.id-1] = eventData
-                
+                localStorage.setItem('events', JSON.stringify(this.events))
             }
             
             
