@@ -9,7 +9,9 @@ const options = {
 	cert: fs.readFileSync('cert.pem')
 };
 
-let expressWs = require('express-ws')(app)
+const httpsServer = https.createServer(options, app);
+
+let expressWs = require('express-ws')(app, httpsServer)
 
 app.ws('/', function(ws, req) {
     ws.on('message', function(msg) {
@@ -18,8 +20,7 @@ app.ws('/', function(ws, req) {
 })
 
 app.use(cors());        // Avoid CORS errors in browsers
-app.use(express.json()) // Populate req.body
-
+app.use(express.json()) // Populate req.body 
 let events = [
     { id: 1, name: "Magnus' Among Us themed Birthday Party", location: "Aedevahe talu, Kursi küla, Harjumaa", date: "2022-08-08 19:00", price: "16.50"},
     { id: 2, name: "Joe Nuts' Public Execution", location: "Raekoja plats", date: "2022-03-25 16:00",  price: "6.99"},
@@ -213,8 +214,6 @@ app.delete('/events/:id', (req, res) => {
 })
 
 
-
-const httpsServer = https.createServer(options, app);
 
 httpsServer.listen(8443, () => {
 	console.log('https api up at localhost:8443')

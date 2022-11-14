@@ -30,14 +30,14 @@ const vue = Vue.createApp({
     },
     async created(){
         try{ 
-            this.events = await (await fetch('http://localhost:8080/events')).json();}
+            this.events = await (await fetch('https://localhost:8443/events')).json();}
         catch(error){
             alert("Something went wrong " + error)
         }
     },
     methods: {
         getEvent: async function (id) {
-            this.eventInModal = await (await fetch(`http://localhost:8080/events/${id}`)).json()
+            this.eventInModal = await (await fetch(`https://localhost:8443/events/${id}`)).json()
             let eventInfoModal = new bootstrap.Modal(document.getElementById('eventInfoModal'), {})
             eventInfoModal.show()
         },
@@ -56,7 +56,7 @@ const vue = Vue.createApp({
                 })                 
             };
 
-            await fetch("http://localhost:8080/sessions", loginRequest)
+            await fetch("https://localhost:8443/sessions", loginRequest)
             .then(response => response.json())
             .then(data => {
                 let signInMsg = document.getElementById("si-error-msg")
@@ -103,7 +103,7 @@ const vue = Vue.createApp({
             document.getElementById("editBtn").style.display ="none"
             localStorage.clear()
 
-            await fetch("http://localhost:8080/logout", logoutRequest)
+            await fetch("https://localhost:8443/logout", logoutRequest)
             .then(response => response.json())
             .then(data => {
                 const signOutMsg = document.getElementById("so-error-msg")
@@ -122,7 +122,7 @@ const vue = Vue.createApp({
                 body: {}  
             }
 
-            await fetch(`http://localhost:8080/events/${id}`, deleteRequest)
+            await fetch(`https://localhost:8443/events/${id}`, deleteRequest)
             .then(response => response.json())
             .then((data) => {
                 if(data.error){
@@ -168,7 +168,7 @@ const vue = Vue.createApp({
                 })                 
             }
 
-            await fetch('http://localhost:8080/events', addRequest)
+            await fetch('https://localhost:8443/events', addRequest)
             .then(response => response.json())
             .then((data) => {
                 if(data.error){
@@ -181,7 +181,7 @@ const vue = Vue.createApp({
             this.addDate.value = ""
             this.addPrice.value = ""
 
-            this.events = await (await fetch('http://localhost:8080/events')).json();
+            this.events = await (await fetch('https://localhost:8443/events')).json();
         },
         
         newOrEditEvent: function (eventData) {
@@ -228,7 +228,7 @@ const vue = Vue.createApp({
                 }) 
             }
 
-            await fetch(`http://localhost:8080/events/${id}`, editRequest)
+            await fetch(`https://localhost:8443/events/${id}`, editRequest)
             .then(response => response.json())
             .then((data) => {
                 if(data.error){
@@ -236,7 +236,7 @@ const vue = Vue.createApp({
                 }
             })
 
-            this.events = await (await fetch('http://localhost:8080/events')).json();
+            this.events = await (await fetch('https://localhost:8443/events')).json();
 
             document.getElementById('editEventName').value = ""
             document.getElementById('editEventLocation').value = ""
@@ -248,7 +248,7 @@ const vue = Vue.createApp({
     }
 }).mount('body')
 
-const connection = new WebSocket("ws://localhost:8080/")
+const connection = new WebSocket("wss://localhost:8443/")
     connection.onmessage = function (event) {
         console.log(event.data)
         
