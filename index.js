@@ -1,10 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const https = require('https');
+const fs = require('fs');
+
+const options = {
+	key: fs.readFileSync('key.pem'),
+	cert: fs.readFileSync('cert.pem')
+};
 
 let expressWs = require('express-ws')(app)
-
-const delay = ms => new Promise(res => setTimeout(res, ms));
 
 app.ws('/', function(ws, req) {
     ws.on('message', function(msg) {
@@ -27,8 +32,7 @@ const users = [{username: "admin", password: "admin", isAdmin: true},
 const sessions = []
 
 
-app.get('/events', async (req, res) => {
-    await delay(3000)
+app.get('/events', (req, res) => {
     res.send(events)
 })
 
@@ -208,6 +212,10 @@ app.delete('/events/:id', (req, res) => {
     }
 })
 
-app.listen(8080, () => {
-    console.log(`API up at: http://localhost:8080`)
+
+
+const httpsServer = https.createServer(options, app);
+
+httpsServer.listen(8443, () => {
+	console.log('https api up at localhost:8443')
 })
