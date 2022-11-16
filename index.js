@@ -10,6 +10,8 @@ const options = {
   cert: fs.readFileSync("cert.pem"),
 };
 const httpsServer = https.createServer(options, app);
+const {OAuth2Client} = require('google-auth-library')
+const OAuth2ClientInstance = new OAuth2Client('49359541663-65j2pbik2ji6k4vig1fae69qj6g8stbh.apps.googleusercontent.com')
 
 let expressWs = require("express-ws")(app, httpsServer);
 let logs = [];
@@ -51,6 +53,14 @@ function createLog(event = {}) {
   const writeStream = fs.createWriteStream(logFile);
   logs.forEach((log) => writeStream.write(`${log},\n`));
   writeStream.end();
+}
+
+async function getClientDataFromGoogle(token){
+    const ticket = await OAuth2ClientInstance.verifyIdToken({
+        idToken: token,
+        audience: '49359541663-65j2pbik2ji6k4vig1fae69qj6g8stbh.apps.googleusercontent.com'
+    });
+    return ticket.getPayload();
 }
 
 app.ws("/", function (ws, req) {
@@ -107,6 +117,22 @@ app.post("/sessions", (req, res) => {
     }
   }
 });
+
+app.post('/oAuth2Login', async (req, res) => {
+    try{
+        const dataFromGoogle = await getClientDataFromGoogle(req.body.credential)
+        sessionId = Math.round(Math.random() * 100000000)
+        newSession = {id: sessionId, user: dataFromGoogle.email, isAdmin: false}
+        sessions.push(newSession)
+
+        createLog({ action: "Login", actionData: newSession });
+
+        return res.status(201).send({success: true, username: dataFromGoogle.email,isAdmin: false, sessionId: sessionId})
+
+    }catch (err) {
+        return res.status(400).send({error: 'Login unsuccessful'})
+    }
+})
 
 app.post("/logout", (req, res) => {
   if (!req.body.username || !req.body.sessionId) {

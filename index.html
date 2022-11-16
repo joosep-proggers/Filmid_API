@@ -9,12 +9,16 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 	</head>
 	<body>
-
-		<!-- Sign in panel -->
-
+		
 		<div id="sign-in">
-			<button class="btn" id="sign-in-btn" onclick="showLoginPanel()" style="display: block;">Sign In</button>
-			<button class="btn" id="sign-out-btn" @click="logout" style="display: none;">Sign Out</button>
+			<div class="container-fluid justify-content-between mt-2" style="display: flex;">
+				<div class="justify-content-start" style="display: flex;">
+				<button class="btn btn-light" id="sign-in-btn" onclick="showLoginPanel()" style="display: block;">Sign In</button>
+				<button class="btn btn-light" id="sign-out-btn" @click="logout" style="display: none;">Sign Out</button>
+				<script src="https://accounts.google.com/gsi/client" async defer></script>
+				</div>
+				<button class="btn btn-info">See logs</button>
+			</div>
 			<p class="m-2 text-danger" id="so-error-msg"></p>
 			<div id="signIn" style="display: none;">
 				<div>
@@ -31,16 +35,15 @@
 						<div class="sign-in-error">
 							<p class="m-2 text-danger" id="si-error-msg"></p>
 						</div>
+						<div id="googleSigninDiv" style="text-align: center;"></div>
 						<div class="sign-in-footer">
 							<button @click="login" type="button" class="btn btn-secondary m-2" data-bs-dismiss="modal">Sign In</button>
 						</div>
+						
 					</div>
 				</div>
 			</div>
 		</div>
-
-		<!-- Events table view -->
-
 		<div id="events">
 			<table id="eventsTable" class="table table-striped table-bordered">
 				<tr>
@@ -73,16 +76,13 @@
 							</table>
 						</div>
 						<div class="modal-footer">
-							<button @click="showEditEventModal" class="btn btn-primary" id="editBtn" data-bs-dismiss="modal" style="display: none;">Edit</button>
+							<button @click="showEditEventModal(eventInModal.id)" class="btn btn-primary" id="editBtn" data-bs-dismiss="modal" style="display: none;">Edit</button>
 							<button @click="deleteEvent(eventInModal.id)" type="button" class="btn btn-danger" id="deleteBtn" style="display: none;" data-bs-dismiss="modal">Delete</button>
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 						</div>
 					</div>
 				</div>
 			</div>
-
-			<!-- Event adding modal -->
-
 			<div id="addEventModal" class="modal">
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -114,48 +114,44 @@
 					</div>
 				</div>
 			</div>
-
-			<!-- Event editing modal -->
-
 			<div id="editEventModal" class="modal">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h4>Fields left empty will not be changed</h4>
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
 							<table class="table table-striped">
 								<tr>
 									<td>
-										<label for="editName">{{eventInModal.name}}</label>
+										<label for="editName">Name: </label>
 									</td>
 									<td>
-										<input type="text" id="editEventName" name="editName"></input>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<label for="editLocation">{{eventInModal.location}}</label>
-									</td>
-									<td>
-										<input type="text" id="editEventLocation" name="editLocation"></input>
+										<input type="text" id="editEventName" name="editName" v-model="editName"></input>
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<label for="editDate">{{eventInModal.date}}</label>
+										<label for="editLocation">Location: </label>
 									</td>
 									<td>
-										<input type="datetime-local" id="editEventDate" name="editDate"></input>
+										<input type="text" id="editEventLocation" name="editLocation" v-model="editLocation"></input>
 									</td>
 								</tr>
 								<tr>
 									<td>
-										<label for="editPrice">{{eventInModal.price}}</label>
+										<label for="editDate">Date: </label>
 									</td>
 									<td>
-										<input type="number" min="0" id="editEventPrice" name="editPrice"></input>
+										<input type="datetime-local" id="editEventDate" name="editDate" v-model="editDate"></input>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label for="editPrice">Price: </label>
+									</td>
+									<td>
+										<input type="number" min="0" id="editEventPrice" name="editPrice" v-model="editPrice"></input>
 									</td>
 								</tr>
 							</table>	
@@ -171,5 +167,44 @@
 		<script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		<script src="./rest-client.js"></script>
+		<script src="./checkLogin.js"></script>
+		<script>
+			function handleCredentialResponse(response) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', 'https://localhost:8443/oAuth2Login');
+				xhr.setRequestHeader('Content-Type', 'application/json');
+				xhr.onload = function () {
+					// check if the response is valid
+					if (xhr.status === 201) {
+						let sessionId = JSON.parse(xhr.response).sessionId
+						let username = JSON.parse(xhr.response).username
+						// parse the response and extract the sessionId and save it in a cookie
+						localStorage.setItem("sessionId", sessionId)
+						localStorage.setItem("username", username)
+						localStorage.setItem("isAdmin", false)
+
+						document.getElementById("signIn").style.display = "none"
+						document.getElementById("sign-in-btn").style.display = "none"
+						document.getElementById("sign-out-btn").style.display = "block"
+						signInMsg.textContent = ""
+						
+					} else {
+						console.log('Request failed.  Returned status of ' + xhr.status + " " + xhr.statusText + " " + xhr.responseText);
+					}
+				};
+				xhr.send(JSON.stringify(response));
+			}
+			window.onload = function () {
+				google.accounts.id.initialize({
+					client_id: "49359541663-65j2pbik2ji6k4vig1fae69qj6g8stbh.apps.googleusercontent.com", // Replace with your Google Client ID
+					callback: handleCredentialResponse // We choose to handle the callback in client side, so we include a reference to a function that will handle the response
+				});
+				
+				google.accounts.id.renderButton(
+					document.getElementById("googleSigninDiv"), 
+					{ theme: "outline", size: "large" }  
+				);
+				}
+		</script>
 	</body>
 </html>
