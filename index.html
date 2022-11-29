@@ -9,41 +9,72 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 	</head>
 	<body>
-		
+		<!-- Sign in panel -->
+
 		<div id="sign-in">
-			<div class="container-fluid justify-content-between mt-2" style="display: flex;">
-				<div class="justify-content-start" style="display: flex;">
-				<button class="btn btn-light" id="sign-in-btn" onclick="showLoginPanel()" style="display: block;">Sign In</button>
-				<button class="btn btn-light" id="sign-out-btn" @click="logout" style="display: none;">Sign Out</button>
-				<script src="https://accounts.google.com/gsi/client" async defer></script>
-				</div>
-				<button class="btn btn-info">See logs</button>
+			<div class="container-fluid d-flex justify-content-between mt-2">
+			  <div class="justify-content-start d-flex">
+				<button
+				  class="btn btn-outline-dark"
+				  id="sign-in-btn"
+				  onclick="showLoginPanel()"
+				  style="display: block;"
+				>
+				  Sign In
+				</button>
+				<button
+				  class="btn btn-outline-dark"
+				  id="sign-out-btn"
+				  @click="logout"
+				  style="display: none;"
+				>
+				  Sign Out
+				</button>
+				<script
+				  src="https://accounts.google.com/gsi/client"
+				  async
+				  defer
+				></script>
+			  </div>
+			  <button
+				class="btn btn-outline-info"
+				id="logs-btn"
+				onclick="location.href='./logs.html'"
+				style="display: none;"
+			  >
+				See logs
+			  </button>
 			</div>
 			<p class="m-2 text-danger" id="so-error-msg"></p>
 			<div id="signIn" style="display: none;">
-				<div>
-					<div>
-						<div class="sign-in-header">
-							<h1 class="m-2">Sign In</h1>
-						</div>
-						<div class="sign-in-body">
-							<label class="m-2" for="username">Username:</label>
-							<input class="m-2" type="text" id="username" name="username">
-							<label class="m-2" for="password">Password:</label>
-							<input class="m-2" type="password" id="password" name="password">
-						</div>
-						<div class="sign-in-error">
-							<p class="m-2 text-danger" id="si-error-msg"></p>
-						</div>
-						<div id="googleSigninDiv" style="text-align: center;"></div>
-						<div class="sign-in-footer">
-							<button @click="login" type="button" class="btn btn-secondary m-2" data-bs-dismiss="modal">Sign In</button>
-						</div>
-						
-					</div>
-				</div>
+			  <div class="sign-in-header">
+				<h1 class="m-2">Sign In</h1>
+			  </div>
+			  <div class="sign-in-body">
+				<label class="m-2" for="username">Username:</label>
+				<input class="m-2" type="text" id="username" name="username" />
+				<label class="m-2" for="password">Password:</label>
+				<input class="m-2" type="password" id="password" name="password" />
+			  </div>
+			  <div class="sign-in-error">
+				<p class="m-2 text-danger" id="si-error-msg"></p>
+			  </div>
+			  <div id="googleSigninDiv" style="text-align: center;"></div>
+			  <div class="sign-in-footer">
+				<button
+				  @click="login"
+				  type="button"
+				  class="btn btn-outline-secondary m-2"
+				  data-bs-dismiss="modal"
+				>
+				  Sign In
+				</button>
+			  </div>
 			</div>
-		</div>
+		  </div>
+
+		  <!-- Events table view -->
+
 		<div id="events">
 			<table id="eventsTable" class="table table-striped table-bordered">
 				<tr>
@@ -100,7 +131,7 @@
 									<input type="text" id="addEventLocation" name="location"></input>
 								</td></tr>
 									<label for="date">Date</label>
-									<input type="date" id="addEventDate" name="date"></input>
+									<input type="datetime-local" id="addEventDate" name="date"></input>
 								<tr><td>
 									<label for="price">Price</label>
 									<input type="number" min="0" id="addEventPrice" name="price"></input>
@@ -116,54 +147,86 @@
 			</div>
 			<div id="editEventModal" class="modal">
 				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<table class="table table-striped">
-								<tr>
-									<td>
-										<label for="editName">Name: </label>
-									</td>
-									<td>
-										<input type="text" id="editEventName" name="editName" v-model="editName"></input>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<label for="editLocation">Location: </label>
-									</td>
-									<td>
-										<input type="text" id="editEventLocation" name="editLocation" v-model="editLocation"></input>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<label for="editDate">Date: </label>
-									</td>
-									<td>
-										<input type="datetime-local" id="editEventDate" name="editDate" v-model="editDate"></input>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<label for="editPrice">Price: </label>
-									</td>
-									<td>
-										<input type="number" min="0" id="editEventPrice" name="editPrice" v-model="editPrice"></input>
-									</td>
-								</tr>
-							</table>	
-						</div>
-						<div class="modal-footer">
-							<button @click="editEvent(eventInModal.id)" class="btn btn-success" id="editEventBtn" data-bs-dismiss="modal">Save changes</button>
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						</div>
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h4>Fields left empty will not be changed</h4>
+					  <button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"
+					  ></button>
 					</div>
+					<div class="modal-body">
+					  <table class="table table-striped">
+						<tr>
+						  <td>
+							<label for="editName">{{eventInModal.name}}</label>
+						  </td>
+						  <td>
+							<input type="text" id="editEventName" name="editName" />
+						  </td>
+						</tr>
+						<tr>
+						  <td>
+							<label for="editLocation">{{eventInModal.location}}</label>
+						  </td>
+						  <td>
+							<input
+							  type="text"
+							  id="editEventLocation"
+							  name="editLocation"
+							/>
+						  </td>
+						</tr>
+						<tr>
+						  <td>
+							<label for="editDate">{{eventInModal.date}}</label>
+						  </td>
+						  <td>
+							<input
+							  type="datetime-local"
+							  id="editEventDate"
+							  name="editDate"
+							/>
+						  </td>
+						</tr>
+						<tr>
+						  <td>
+							<label for="editPrice">{{eventInModal.price}}</label>
+						  </td>
+						  <td>
+							<input
+							  type="number"
+							  min="0"
+							  id="editEventPrice"
+							  name="editPrice"
+							/>
+						  </td>
+						</tr>
+					  </table>
+					</div>
+					<div class="modal-footer">
+					  <button
+						@click="editEvent(eventInModal.id)"
+						class="btn btn-success"
+						id="editEventBtn"
+						data-bs-dismiss="modal"
+					  >
+						Save changes
+					  </button>
+					  <button
+						type="button"
+						class="btn btn-secondary"
+						data-bs-dismiss="modal"
+					  >
+						Close
+					  </button>
+					</div>
+				  </div>
 				</div>
+			  </div>
 			</div>
-		</div>
 		<script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 		<script src="./rest-client.js"></script>
@@ -186,7 +249,7 @@
 						document.getElementById("signIn").style.display = "none"
 						document.getElementById("sign-in-btn").style.display = "none"
 						document.getElementById("sign-out-btn").style.display = "block"
-						signInMsg.textContent = ""
+						document.getElementById("si-error-msg").textContent = ""
 						
 					} else {
 						console.log('Request failed.  Returned status of ' + xhr.status + " " + xhr.statusText + " " + xhr.responseText);

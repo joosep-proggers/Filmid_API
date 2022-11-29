@@ -2,12 +2,14 @@ const vue = Vue.createApp({
     data() {
         return {
             eventInModal: {name: null}, 
-            events: [] 
+            events: [],
+            logs: []
         }
     },
     async created(){
         try{ 
-            this.events = await (await fetch('https://localhost:8443/events')).json();}
+            this.events = await (await fetch('https://localhost:8443/events')).json();
+        }
         catch(error){
             alert("Something went wrong " + error)
         }
@@ -49,12 +51,10 @@ const vue = Vue.createApp({
                     signInMsg.textContent = ""
 
                     if(localStorage.getItem('isAdmin') == 'true'){
-                        deleteBtn = document.getElementById('deleteBtn'); 
-                        addBtn = document.getElementById('addBtn')      
-                        editBtn = document.getElementById("editBtn")
-                        deleteBtn.style.display = "block"
-                        addBtn.style.display = "block"
-                        editBtn.style.display = "block"
+                        document.getElementById('deleteBtn').style.display = 'block'
+                        document.getElementById('addBtn').style.display = 'block'
+                        document.getElementById("editBtn").style.display = 'block'
+                        document.getElementById('logs-btn').style.display = 'block'
                     }  
                 } 
             })
@@ -181,9 +181,6 @@ const vue = Vue.createApp({
         },
         
         editEvent: async function (id) {
-
-            
-
             this.editName = document.getElementById('editEventName').value
             this.editLocation = document.getElementById('editEventLocation').value
             this.editDate = document.getElementById('editEventDate').value
@@ -213,7 +210,7 @@ const vue = Vue.createApp({
                 }
             })
 
-            this.events = await (await fetch('https://localhost:8443/events')).json();
+            this.events = await (await fetch('https://localhost:8443/events'))
 
             document.getElementById('editEventName').value = ""
             document.getElementById('editEventLocation').value = ""
@@ -221,13 +218,54 @@ const vue = Vue.createApp({
             document.getElementById('editEventPrice').value = ""
 
 
+        },
+        getLogs: async function (){
+
+            
+            const getRequest = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": localStorage.getItem('sessionId')
+                },
+            }
+            
+            await fetch(`https://localhost:8443/logs`, getRequest)
+                .then(response => response.json())
+                .then(data => {
+                    data = data;
+                    data.logs.forEach(element => {
+                        let logFields = element.match(/(\\.|[^;])+/g)
+                        let log = []
+                        //let logFields = element.split(';')
+                        const actions = [
+                            "Login",
+                            "Logout",
+                            "Event created",
+                            "Event changed",
+                            "Event deleted",
+                            ]
+                        
+                        logFields[2] = actions[logFields[2]]
+
+                        logFields.forEach((element, index) => {
+                            if(typeof(element) == 'string'){
+                                element = element.replace(/\\;/g,';')
+                                logFields[index] = element
+                            }
+                        })
+                        
+                        log.push(logFields)
+        
+                        this.logs.push(log)
+                    });
+                })
         }
     }
 }).mount('body')
 
 const connection = new WebSocket("wss://localhost:8443/")
     connection.onmessage = function (event) {
-        console.log(event.data)
         
         if (event.data.length > 3) {
             vue.newOrEditEvent(event.data)

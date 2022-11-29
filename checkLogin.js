@@ -12,10 +12,12 @@ function checkIfLoggedIn() {
     if (localStorage.length != 0) {
         document.getElementById('sign-in-btn').style.display = "none"
         document.getElementById('sign-out-btn').style.display = "block"
+        
         if (localStorage.getItem('isAdmin') == 'true') { 
             document.getElementById('deleteBtn').style.display = "block"
             document.getElementById('addBtn').style.display = "block"
             document.getElementById('editBtn').style.display = "block"
+            document.getElementById('logs-btn').style.display = 'block'
         }	
     }
 }
